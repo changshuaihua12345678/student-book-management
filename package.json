@@ -1,5 +1,5 @@
 {
-  "name": "student-book",
+  "name": "habit-tracker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,8 +13,7 @@
     "vue-router": "^4.4.5",
     "pinia": "^2.2.6",
     "axios": "^1.7.9",
-    "element-plus": "^2.8.5",
-    "echarts": "^5.5.1"
+    "element-plus": "^2.8.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",

@@ -1,177 +1,223 @@
 import { defineStore } from 'pinia'
 
-export const useBookStore = defineStore('book', {
+export const usePomodoroStore = defineStore('pomodoro', {
   state: () => ({
-    books: [
+    workTime: 25,
+    breakTime: 5,
+    longBreakTime: 15,
+    sessions: 0,
+    currentTime: 25 * 60,
+    isRunning: false,
+    isBreak: false,
+    timer: null
+  }),
+  getters: {
+    formattedTime: (state) => {
+      const minutes = Math.floor(state.currentTime / 60)
+      const seconds = state.currentTime % 60
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    }
+  },
+  actions: {
+    startTimer() {
+      if (!this.isRunning) {
+        this.isRunning = true
+        this.timer = setInterval(() => {
+          if (this.currentTime > 0) {
+            this.currentTime--
+          } else {
+            this.completeSession()
+          }
+        }, 1000)
+      }
+    },
+    pauseTimer() {
+      this.isRunning = false
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+    resetTimer() {
+      this.pauseTimer()
+      this.currentTime = this.isBreak ? this.breakTime * 60 : this.workTime * 60
+    },
+    completeSession() {
+      this.pauseTimer()
+      if (this.isBreak) {
+        this.sessions++
+        this.isBreak = false
+        this.currentTime = this.workTime * 60
+      } else {
+        if (this.sessions % 4 === 3) {
+          this.currentTime = this.longBreakTime * 60
+        } else {
+          this.currentTime = this.breakTime * 60
+        }
+        this.isBreak = true
+      }
+    },
+    updateWorkTime(time) {
+      this.workTime = time
+      if (!this.isRunning && !this.isBreak) {
+        this.currentTime = time * 60
+      }
+    },
+    updateBreakTime(time) {
+      this.breakTime = time
+    },
+    updateLongBreakTime(time) {
+      this.longBreakTime = time
+    }
+  }
+})
+
+export const useTodoStore = defineStore('todo', {
+  state: () => ({
+    todos: JSON.parse(localStorage.getItem('todos')) || [
       {
         id: 1,
-        title: 'Vue.js实战',
-        author: '梁灏',
-        isbn: '9787115421878',
-        category: '前端开发',
-        stock: 10,
-        borrowed: 2
+        title: '完成Vue3项目',
+        description: '创建好习惯养成系统',
+        completed: false,
+        priority: 'high',
+        dueDate: '2026-03-10'
       },
       {
         id: 2,
-        title: 'JavaScript高级程序设计',
-        author: 'Nicholas C. Zakas',
-        isbn: '9787115275790',
-        category: '前端开发',
-        stock: 15,
-        borrowed: 3
-      },
-      {
-        id: 3,
-        title: 'Python编程：从入门到实践',
-        author: 'Eric Matthes',
-        isbn: '9787115428028',
-        category: '后端开发',
-        stock: 8,
-        borrowed: 1
+        title: '学习Pinia',
+        description: '掌握状态管理',
+        completed: false,
+        priority: 'medium',
+        dueDate: '2026-03-05'
       }
     ]
   }),
   getters: {
-    availableBooks: (state) => state.books.filter(book => book.stock > 0),
-    totalBooks: (state) => state.books.length
+    pendingTodos: (state) => state.todos.filter(todo => !todo.completed),
+    completedTodos: (state) => state.todos.filter(todo => todo.completed),
+    highPriorityTodos: (state) => state.todos.filter(todo => todo.priority === 'high' && !todo.completed)
   },
   actions: {
-    addBook(book) {
-      const newId = Math.max(...this.books.map(b => b.id), 0) + 1
-      this.books.push({ ...book, id: newId, borrowed: 0 })
+    addTodo(todo) {
+      const newId = Math.max(...this.todos.map(t => t.id), 0) + 1
+      this.todos.push({ ...todo, id: newId, completed: false })
+      localStorage.setItem('todos', JSON.stringify(this.todos))
     },
-    updateBook(updatedBook) {
-      const index = this.books.findIndex(book => book.id === updatedBook.id)
+    toggleTodo(id) {
+      const todo = this.todos.find(t => t.id === id)
+      if (todo) {
+        todo.completed = !todo.completed
+        localStorage.setItem('todos', JSON.stringify(this.todos))
+      }
+    },
+    deleteTodo(id) {
+      this.todos = this.todos.filter(t => t.id !== id)
+      localStorage.setItem('todos', JSON.stringify(this.todos))
+    },
+    updateTodo(updatedTodo) {
+      const index = this.todos.findIndex(t => t.id === updatedTodo.id)
       if (index !== -1) {
-        this.books[index] = { ...this.books[index], ...updatedBook }
-      }
-    },
-    deleteBook(id) {
-      this.books = this.books.filter(book => book.id !== id)
-    },
-    borrowBook(id) {
-      const book = this.books.find(book => book.id === id)
-      if (book && book.stock > 0) {
-        book.stock--
-        book.borrowed++
-      }
-    },
-    returnBook(id) {
-      const book = this.books.find(book => book.id === id)
-      if (book && book.borrowed > 0) {
-        book.stock++
-        book.borrowed--
+        this.todos[index] = { ...this.todos[index], ...updatedTodo }
+        localStorage.setItem('todos', JSON.stringify(this.todos))
       }
     }
   }
 })
 
-export const useStudentStore = defineStore('student', {
+export const useHabitStore = defineStore('habit', {
   state: () => ({
-    students: [
+    habits: JSON.parse(localStorage.getItem('habits')) || [
       {
         id: 1,
-        name: '张三',
-        studentId: '2021001',
-        major: '计算机科学与技术',
-        grade: '大三',
-        borrowedBooks: 2
+        name: '每日阅读',
+        description: '每天阅读30分钟',
+        frequency: 'daily',
+        streak: 5,
+        lastCompleted: '2026-03-01'
       },
       {
         id: 2,
-        name: '李四',
-        studentId: '2021002',
-        major: '软件工程',
-        grade: '大二',
-        borrowedBooks: 1
+        name: '晨跑',
+        description: '每天早上跑步10分钟',
+        frequency: 'daily',
+        streak: 3,
+        lastCompleted: '2026-03-01'
       },
       {
         id: 3,
-        name: '王五',
-        studentId: '2021003',
-        major: '数据科学',
-        grade: '大一',
-        borrowedBooks: 0
+        name: '学习编程',
+        description: '每周学习5小时',
+        frequency: 'weekly',
+        streak: 2,
+        lastCompleted: '2026-02-29'
       }
-    ]
-  }),
-  getters: {
-    totalStudents: (state) => state.students.length
-  },
-  actions: {
-    addStudent(student) {
-      const newId = Math.max(...this.students.map(s => s.id), 0) + 1
-      this.students.push({ ...student, id: newId, borrowedBooks: 0 })
-    },
-    updateStudent(updatedStudent) {
-      const index = this.students.findIndex(student => student.id === updatedStudent.id)
-      if (index !== -1) {
-        this.students[index] = { ...this.students[index], ...updatedStudent }
-      }
-    },
-    deleteStudent(id) {
-      this.students = this.students.filter(student => student.id !== id)
-    },
-    incrementBorrowedBooks(studentId) {
-      const student = this.students.find(s => s.studentId === studentId)
-      if (student) {
-        student.borrowedBooks++
-      }
-    },
-    decrementBorrowedBooks(studentId) {
-      const student = this.students.find(s => s.studentId === studentId)
-      if (student && student.borrowedBooks > 0) {
-        student.borrowedBooks--
-      }
+    ],
+    completions: JSON.parse(localStorage.getItem('completions')) || {
+      '2026-03-01': [1, 2],
+      '2026-02-29': [1, 2, 3],
+      '2026-02-28': [1, 2]
     }
-  }
-})
-
-export const useBorrowStore = defineStore('borrow', {
-  state: () => ({
-    borrows: [
-      {
-        id: 1,
-        bookId: 1,
-        studentId: '2021001',
-        borrowDate: '2026-02-15',
-        returnDate: null,
-        status: 'borrowed'
-      },
-      {
-        id: 2,
-        bookId: 2,
-        studentId: '2021001',
-        borrowDate: '2026-02-16',
-        returnDate: null,
-        status: 'borrowed'
-      },
-      {
-        id: 3,
-        bookId: 3,
-        studentId: '2021002',
-        borrowDate: '2026-02-17',
-        returnDate: null,
-        status: 'borrowed'
-      }
-    ]
   }),
   getters: {
-    activeBorrows: (state) => state.borrows.filter(borrow => borrow.status === 'borrowed'),
-    returnedBorrows: (state) => state.borrows.filter(borrow => borrow.status === 'returned')
+    dailyHabits: (state) => state.habits.filter(habit => habit.frequency === 'daily'),
+    weeklyHabits: (state) => state.habits.filter(habit => habit.frequency === 'weekly'),
+    monthlyHabits: (state) => state.habits.filter(habit => habit.frequency === 'monthly')
   },
   actions: {
-    addBorrow(borrow) {
-      const newId = Math.max(...this.borrows.map(b => b.id), 0) + 1
-      this.borrows.push({ ...borrow, id: newId, status: 'borrowed' })
+    addHabit(habit) {
+      const newId = Math.max(...this.habits.map(h => h.id), 0) + 1
+      this.habits.push({ ...habit, id: newId, streak: 0, lastCompleted: null })
+      localStorage.setItem('habits', JSON.stringify(this.habits))
     },
-    returnBook(id) {
-      const borrow = this.borrows.find(b => b.id === id)
-      if (borrow) {
-        borrow.returnDate = new Date().toISOString().split('T')[0]
-        borrow.status = 'returned'
+    completeHabit(habitId) {
+      const today = new Date().toISOString().split('T')[0]
+      if (!this.completions[today]) {
+        this.completions[today] = []
       }
+      if (!this.completions[today].includes(habitId)) {
+        this.completions[today].push(habitId)
+        const habit = this.habits.find(h => h.id === habitId)
+        if (habit) {
+          habit.streak++
+          habit.lastCompleted = today
+        }
+        localStorage.setItem('habits', JSON.stringify(this.habits))
+        localStorage.setItem('completions', JSON.stringify(this.completions))
+      }
+    },
+    uncompleteHabit(habitId) {
+      const today = new Date().toISOString().split('T')[0]
+      if (this.completions[today]) {
+        this.completions[today] = this.completions[today].filter(id => id !== habitId)
+        const habit = this.habits.find(h => h.id === habitId)
+        if (habit && habit.lastCompleted === today) {
+          habit.streak = Math.max(0, habit.streak - 1)
+          habit.lastCompleted = null
+        }
+        localStorage.setItem('habits', JSON.stringify(this.habits))
+        localStorage.setItem('completions', JSON.stringify(this.completions))
+      }
+    },
+    deleteHabit(id) {
+      this.habits = this.habits.filter(h => h.id !== id)
+      // 清理完成记录
+      for (const date in this.completions) {
+        this.completions[date] = this.completions[date].filter(habitId => habitId !== id)
+      }
+      localStorage.setItem('habits', JSON.stringify(this.habits))
+      localStorage.setItem('completions', JSON.stringify(this.completions))
+    },
+    updateHabit(updatedHabit) {
+      const index = this.habits.findIndex(h => h.id === updatedHabit.id)
+      if (index !== -1) {
+        this.habits[index] = { ...this.habits[index], ...updatedHabit }
+        localStorage.setItem('habits', JSON.stringify(this.habits))
+      }
+    },
+    isHabitCompleted(habitId) {
+      const today = new Date().toISOString().split('T')[0]
+      return this.completions[today]?.includes(habitId) || false
     }
   }
 })

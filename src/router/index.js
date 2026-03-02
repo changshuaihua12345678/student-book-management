@@ -10,34 +10,28 @@ const router = createRouter({
       meta: { title: '首页' }
     },
     {
-      path: '/books',
-      name: 'books',
-      component: () => import('../views/BookManage.vue'),
-      meta: { title: '图书管理' }
+      path: '/pomodoro',
+      name: 'pomodoro',
+      component: () => import('../views/PomodoroView.vue'),
+      meta: { title: '番茄钟' }
     },
     {
-      path: '/students',
-      name: 'students',
-      component: () => import('../views/StudentManage.vue'),
-      meta: { title: '学生管理' }
+      path: '/todolist',
+      name: 'todolist',
+      component: () => import('../views/TodoListView.vue'),
+      meta: { title: '待办事项' }
     },
     {
-      path: '/borrow',
-      name: 'borrow',
-      component: () => import('../views/BorrowManage.vue'),
-      meta: { title: '借阅管理' }
-    },
-    {
-      path: '/statistics',
-      name: 'statistics',
-      component: () => import('../views/StatisticsView.vue'),
-      meta: { title: '数据统计' }
+      path: '/habits',
+      name: 'habits',
+      component: () => import('../views/HabitsView.vue'),
+      meta: { title: '习惯追踪' }
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || '学生图书管理系统'
+  document.title = to.meta.title || '好习惯养成系统'
   next()
 })
 
