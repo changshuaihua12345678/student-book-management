@@ -1,0 +1,239 @@
+/* 全局样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f5f7fa;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 通用动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 卡片样式 */
+.el-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.el-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* 按钮样式 */
+.el-button {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.el-button:hover {
+  transform: translateY(-1px);
+}
+
+/* 表格样式 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.el-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* 表单样式 */
+.el-form-item {
+  margin-bottom: 16px;
+}
+
+/* 对话框样式 */
+.el-dialog {
+  border-radius: 8px;
+}
+
+.el-dialog__header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e4e7ed;
+  border-radius: 8px 8px 0 0;
+}
+
+/* 标签样式 */
+.el-tag {
+  border-radius: 4px;
+}
+
+/* 分页样式 */
+.el-pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 搜索框样式 */
+.el-input {
+  border-radius: 4px;
+}
+
+/* 选择器样式 */
+.el-select {
+  border-radius: 4px;
+}
+
+/* 日期选择器样式 */
+.el-date-picker {
+  border-radius: 4px;
+}
+
+/* 头像样式 */
+.el-avatar {
+  border-radius: 50%;
+}
+
+/* 菜单样式 */
+.el-menu {
+  border-radius: 8px;
+}
+
+/* 加载状态 */
+.el-loading {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.el-loading-spinner {
+  margin-top: -20px;
+}
+
+/* 消息提示 */
+.el-message {
+  min-width: 300px;
+  border-radius: 4px;
+}
+
+/* 确认对话框 */
+.el-message-box {
+  border-radius: 8px;
+}
+
+/* 统计卡片样式 */
+.stats-card {
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 快速链接按钮 */
+.link-button {
+  transition: all 0.3s ease;
+}
+
+.link-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 图表容器 */
+.chart {
+  transition: all 0.3s ease;
+}
+
+.chart:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .el-aside {
+    width: 180px !important;
+  }
+  
+  .logo h2 {
+    font-size: 16px;
+  }
+  
+  .el-menu-item {
+    font-size: 13px;
+  }
+  
+  .el-card {
+    margin-bottom: 16px;
+  }
+  
+  .el-row {
+    margin-bottom: 16px;
+  }
+  
+  .el-col {
+    margin-bottom: 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .el-aside {
+    width: 160px !important;
+  }
+  
+  .logo h2 {
+    font-size: 14px;
+  }
+  
+  .el-menu-item {
+    font-size: 12px;
+  }
+  
+  .el-button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .el-input {
+    font-size: 12px;
+  }
+  
+  .el-table {
+    font-size: 12px;
+  }
+  
+  .el-table th,
+  .el-table td {
+    padding: 8px;
+  }
+}
