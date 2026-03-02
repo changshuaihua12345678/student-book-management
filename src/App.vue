@@ -31,6 +31,9 @@ const changeBackground = () => {
 onMounted(() => {
   // 每30分钟更换一次背景图
   setInterval(changeBackground, 30 * 60 * 1000)
+  
+  // 监听背景刷新事件
+  window.addEventListener('refresh-background', changeBackground)
 })
 </script>
 

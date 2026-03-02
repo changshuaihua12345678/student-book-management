@@ -91,6 +91,62 @@
             </ul>
           </el-card>
         </div>
+        
+        <div class="pomodoro-history" style="margin-top: 30px">
+          <el-card shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <span>番茄钟历史</span>
+                <el-button type="danger" size="small" @click="clearHistory">
+                  <el-icon><i-ep-delete /></el-icon>
+                  清空历史
+                </el-button>
+              </div>
+            </template>
+            <div class="history-stats">
+              <el-row :gutter="20">
+                <el-col :span="8">
+                  <el-card shadow="hover" class="stat-card">
+                    <div class="stat-number">{{ todaySessions.length }}</div>
+                    <div class="stat-label">今日完成</div>
+                  </el-card>
+                </el-col>
+                <el-col :span="8">
+                  <el-card shadow="hover" class="stat-card">
+                    <div class="stat-number">{{ weeklySessions.length }}</div>
+                    <div class="stat-label">本周完成</div>
+                  </el-card>
+                </el-col>
+                <el-col :span="8">
+                  <el-card shadow="hover" class="stat-card">
+                    <div class="stat-number">{{ totalSessions }}</div>
+                    <div class="stat-label">总计完成</div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </div>
+            <div class="history-list" style="margin-top: 20px">
+              <h5>今日记录</h5>
+              <el-empty v-if="todaySessions.length === 0" description="今日暂无记录" />
+              <el-timeline v-else>
+                <el-timeline-item 
+                  v-for="session in todaySessions" 
+                  :key="session.id"
+                  :timestamp="formatTime(session.timestamp)"
+                  type="success"
+                  placement="top"
+                >
+                  <el-card shadow="hover" class="session-card">
+                    <div class="session-info">
+                      <span class="session-type">{{ session.type === 'work' ? '工作' : '休息' }}</span>
+                      <span class="session-duration">{{ session.duration }}分钟</span>
+                    </div>
+                  </el-card>
+                </el-timeline-item>
+              </el-timeline>
+            </div>
+          </el-card>
+        </div>
       </div>
     </el-card>
   </div>
@@ -99,6 +155,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePomodoroStore } from '../stores'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const pomodoroStore = usePomodoroStore()
 
@@ -111,6 +168,9 @@ const isRunning = computed(() => pomodoroStore.isRunning)
 const isBreak = computed(() => pomodoroStore.isBreak)
 const sessions = computed(() => pomodoroStore.sessions)
 const formattedTime = computed(() => pomodoroStore.formattedTime)
+const todaySessions = computed(() => pomodoroStore.todaySessions)
+const weeklySessions = computed(() => pomodoroStore.weeklySessions)
+const totalSessions = computed(() => pomodoroStore.totalSessions)
 
 const toggleTimer = () => {
   if (isRunning.value) {
@@ -134,6 +194,27 @@ const updateBreakTime = (value) => {
 
 const updateLongBreakTime = (value) => {
   pomodoroStore.updateLongBreakTime(value)
+}
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const clearHistory = () => {
+  ElMessageBox.confirm('确定要清空所有番茄钟历史记录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    pomodoroStore.clearHistory()
+    ElMessage.success('历史记录已清空')
+  }).catch(() => {
+    // 取消清空
+  })
 }
 
 onMounted(() => {
@@ -277,6 +358,84 @@ onUnmounted(() => {
   
   .el-col {
     margin-bottom: 15px;
+  }
+}
+
+/* 历史记录样式 */
+.pomodoro-history {
+  width: 100%;
+  max-width: 600px;
+}
+
+.history-stats {
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.history-list h5 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.session-card {
+  width: 100%;
+  margin: 0;
+}
+
+.session-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-type {
+  font-weight: 500;
+  color: #67c23a;
+}
+
+.session-duration {
+  color: #666;
+  font-size: 14px;
+}
+
+@media screen and (max-width: 768px) {
+  .history-stats .el-col {
+    margin-bottom: 15px;
+  }
+  
+  .stat-number {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .stat-number {
+    font-size: 18px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
   }
 }
 </style>
